@@ -1,0 +1,27 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Seed Database",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"run",
+				"seed"
+			],
+			"group": "build",
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "shared"
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "Seed Database",
+			"type": "shell",
+			"command": "npm"
+		}
+	]
+}
