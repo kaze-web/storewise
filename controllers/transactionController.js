@@ -4,37 +4,52 @@ const Product = require('../models/Product');
 exports.createTransaction = async (req, res) => {
   try {
     const { items, paymentMethod } = req.body;
+
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ message: 'No items provided for transaction' });
+    }
+
     let totalAmount = 0;
     const transactionItems = [];
 
     // Validate and calculate items
     for (const item of items) {
+      if (!item.product || !item.quantity) {
+        return res.status(400).json({ message: 'Invalid transaction item format' });
+      }
+
+      const quantity = Number(item.quantity);
+      if (Number.isNaN(quantity) || quantity <= 0) {
+        return res.status(400).json({ message: 'Invalid quantity for transaction item' });
+      }
+
       const product = await Product.findById(item.product);
       if (!product) {
         return res.status(400).json({ message: `Product ${item.product} not found` });
       }
-      if (product.stock < item.quantity) {
-        return res.status(400).json({ message: `Insufficient stock for ${product.name}` });
+      if (product.stock < quantity) {
+        return res.status(400).json({ message: `Insufficient stock for ${product.name}. Available: ${product.stock}` });
       }
 
-      const itemTotal = product.price * item.quantity;
+      const itemTotal = product.price * quantity;
       totalAmount += itemTotal;
 
       transactionItems.push({
         product: product._id,
         productName: product.name,
-        quantity: item.quantity,
+        quantity,
         price: product.price,
         total: itemTotal
       });
 
       // Reduce stock
-      product.stock -= item.quantity;
+      product.stock -= quantity;
       await product.save();
     }
 
     // Create transaction
     const transaction = new Transaction({
+      transactionId: 'TXN' + Date.now() + Math.random().toString(36).substr(2, 5).toUpperCase(),
       items: transactionItems,
       totalAmount,
       paymentMethod,
@@ -46,7 +61,8 @@ exports.createTransaction = async (req, res) => {
 
     res.status(201).json(transaction);
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    console.error('Transaction creation error:', error);
+    res.status(500).json({ message: error.message || 'Server error' });
   }
 };
 

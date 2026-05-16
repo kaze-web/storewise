@@ -17,6 +17,8 @@ function checkAuth() {
         userNameElement.textContent = user.name;
     }
 
+    loadLowStockIndicator();
+
     return true;
 }
 
@@ -59,6 +61,31 @@ function getAuthHeaders() {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
     };
+}
+
+// Load low stock count and update the product nav badge
+async function loadLowStockIndicator() {
+    const badge = document.getElementById('productsLowStockBadge');
+    if (!badge) return;
+
+    try {
+        const response = await apiRequest('/api/products/low-stock');
+        if (!response || !response.ok) {
+            return;
+        }
+
+        const products = await response.json();
+        const count = Array.isArray(products) ? products.length : 0;
+
+        if (count > 0) {
+            badge.textContent = count;
+            badge.classList.remove('d-none');
+        } else {
+            badge.classList.add('d-none');
+        }
+    } catch (error) {
+        console.error('Failed to load low stock indicator', error);
+    }
 }
 
 // API request wrapper with auth
@@ -145,6 +172,7 @@ window.AuthUtils = {
     logout,
     getAuthHeaders,
     apiRequest,
+    loadLowStockIndicator,
     showNotification,
     formatCurrency,
     formatDate,

@@ -31,7 +31,8 @@ const transactionSchema = new mongoose.Schema({
   transactionId: {
     type: String,
     unique: true,
-    required: true
+    required: true,
+    default: () => 'TXN' + Date.now() + Math.random().toString(36).substr(2, 5).toUpperCase()
   },
   items: [transactionItemSchema],
   totalAmount: {
@@ -56,7 +57,7 @@ const transactionSchema = new mongoose.Schema({
 });
 
 // Generate unique transaction ID
-transactionSchema.pre('save', function(next) {
+transactionSchema.pre('validate', function(next) {
   if (!this.transactionId) {
     this.transactionId = 'TXN' + Date.now() + Math.random().toString(36).substr(2, 5).toUpperCase();
   }

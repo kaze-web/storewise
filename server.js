@@ -55,6 +55,10 @@ app.get('/sales', (req, res) => {
   res.render('sales');
 });
 
+app.get('/receipts', (req, res) => {
+  res.render('receipts');
+});
+
 app.get('/reports', (req, res) => {
   res.render('reports');
 });
