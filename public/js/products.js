@@ -195,6 +195,8 @@ function editProduct(productId) {
 }
 
 function getProductFormData() {
+    const barcode = document.getElementById('productBarcode').value.trim();
+
     return {
         name: document.getElementById('productName').value.trim(),
         description: document.getElementById('productDescription').value.trim(),
@@ -203,11 +205,13 @@ function getProductFormData() {
         stock: parseInt(document.getElementById('productStock').value),
         minStock: parseInt(document.getElementById('productMinStock').value) || 5,
         category: document.getElementById('productCategory').value.trim(),
-        barcode: document.getElementById('productBarcode').value.trim()
+        barcode: barcode || undefined
     };
 }
 
 function getEditProductFormData() {
+    const barcode = document.getElementById('editProductBarcode').value.trim();
+
     return {
         name: document.getElementById('editProductName').value.trim(),
         description: document.getElementById('editProductDescription').value.trim(),
@@ -216,7 +220,7 @@ function getEditProductFormData() {
         stock: parseInt(document.getElementById('editProductStock').value),
         minStock: parseInt(document.getElementById('editProductMinStock').value) || 5,
         category: document.getElementById('editProductCategory').value.trim(),
-        barcode: document.getElementById('editProductBarcode').value.trim()
+        barcode: barcode || undefined
     };
 }
 

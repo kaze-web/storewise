@@ -38,6 +38,10 @@ exports.getProduct = async (req, res) => {
 
 exports.createProduct = async (req, res) => {
   try {
+    if (req.body.barcode !== undefined && req.body.barcode !== null) {
+      req.body.barcode = String(req.body.barcode).trim() || undefined;
+    }
+
     const product = new Product(req.body);
     await product.save();
     res.status(201).json(product);
@@ -52,6 +56,10 @@ exports.createProduct = async (req, res) => {
 
 exports.updateProduct = async (req, res) => {
   try {
+    if (req.body.barcode !== undefined && req.body.barcode !== null) {
+      req.body.barcode = String(req.body.barcode).trim() || undefined;
+    }
+
     const product = await Product.findByIdAndUpdate(
       req.params.id,
       req.body,
