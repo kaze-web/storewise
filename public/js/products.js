@@ -13,6 +13,8 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('lowStockFilter').addEventListener('change', filterProducts);
     document.getElementById('saveProductBtn').addEventListener('click', saveProduct);
     document.getElementById('updateProductBtn').addEventListener('click', updateProduct);
+    document.getElementById('productName').addEventListener('input', () => suggestCategoryFromName('productName', 'productCategory'));
+    document.getElementById('editProductName').addEventListener('input', () => suggestCategoryFromName('editProductName', 'editProductCategory'));
 });
 
 async function loadProducts() {
@@ -23,6 +25,7 @@ async function loadProducts() {
         // Extract categories
         categories = new Set(products.map(p => p.category).filter(c => c));
         updateCategoryFilter();
+        updateCategorySuggestions();
 
         displayProducts(products);
     } catch (error) {
@@ -41,6 +44,37 @@ function updateCategoryFilter() {
         option.textContent = category;
         select.appendChild(option);
     });
+}
+
+function updateCategorySuggestions() {
+    const datalist = document.getElementById('productCategoriesList');
+    if (!datalist) return;
+    datalist.innerHTML = '';
+
+    Array.from(categories).sort().forEach(category => {
+        const option = document.createElement('option');
+        option.value = category;
+        datalist.appendChild(option);
+    });
+}
+
+function suggestCategoryFromName(nameInputId, categoryInputId) {
+    const nameInput = document.getElementById(nameInputId);
+    const categoryInput = document.getElementById(categoryInputId);
+    if (!nameInput || !categoryInput) return;
+
+    const nameValue = nameInput.value.trim().toLowerCase();
+    if (!nameValue || categoryInput.value.trim()) return;
+
+    const match = Array.from(categories).find(category => {
+        const lowerCategory = category.toLowerCase();
+        return nameValue.includes(lowerCategory) || lowerCategory.includes(nameValue) ||
+            nameValue.split(' ').some(word => lowerCategory.includes(word));
+    });
+
+    if (match) {
+        categoryInput.value = match;
+    }
 }
 
 function displayProducts(productsToShow) {

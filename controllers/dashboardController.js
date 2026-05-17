@@ -27,9 +27,19 @@ exports.getDashboardData = async (req, res) => {
     // Total products
     const totalProducts = await Product.countDocuments();
 
-    // Low stock alerts
+    // Low stock and out-of-stock alerts
     const lowStockProducts = await Product.find({
       $expr: { $lte: ['$stock', '$minStock'] }
+    }).sort({ stock: 1 });
+
+    const outOfStockCount = await Product.countDocuments({ stock: 0 });
+    const lowStockOnlyCount = await Product.countDocuments({
+      $expr: {
+        $and: [
+          { $lte: ['$stock', '$minStock'] },
+          { $gt: ['$stock', 0] }
+        ]
+      }
     });
 
     // Top selling products (last 30 days)
@@ -59,6 +69,8 @@ exports.getDashboardData = async (req, res) => {
       dailySales: dailySales[0] || { total: 0, count: 0 },
       totalProducts,
       lowStockAlerts: lowStockProducts.length,
+      outOfStockCount,
+      lowStockOnlyCount,
       lowStockProducts,
       topSellingProducts: topSelling
     });

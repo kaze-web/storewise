@@ -79,9 +79,11 @@ async function loadLowStockIndicator() {
 
         if (count > 0) {
             badge.textContent = count;
+            badge.title = `${count} out-of-stock / low-stock product(s)`;
             badge.classList.remove('d-none');
         } else {
             badge.classList.add('d-none');
+            badge.removeAttribute('title');
         }
     } catch (error) {
         console.error('Failed to load low stock indicator', error);

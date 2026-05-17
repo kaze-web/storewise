@@ -122,12 +122,18 @@ async function loadLowStockProducts() {
             return;
         }
 
-        const html = products.slice(0, 5).map(product => `
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <span>${product.name}</span>
-                <span class="badge bg-warning">${product.stock} left</span>
-            </div>
-        `).join('');
+        const html = products.slice(0, 5).map(product => {
+            const isOutOfStock = product.stock === 0;
+            const statusLabel = isOutOfStock ? 'Out of Stock' : 'Low Stock';
+            const badgeClass = isOutOfStock ? 'bg-danger' : 'bg-warning';
+
+            return `
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span>${product.name}</span>
+                    <span class="badge ${badgeClass}">${statusLabel}</span>
+                </div>
+            `;
+        }).join('');
 
         container.innerHTML = html;
     } catch (error) {
